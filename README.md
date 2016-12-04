@@ -9,33 +9,11 @@ back in 2008.
 
 ## Building
 
-Obviously, Z3 is required to build the CEGIS library. In order to build Z3, Python
-is needed first.
-
-You can either use Python 2.x
+Git, g++, cmake, a Python interpreter and the Boost Library are necessary in order to build CEGIS. In *Ubuntu* the packages can be installed with
 
 ```sh
-sudo apt-get install python
+sudo apt-get install git g++ cmake python libboost-all-dev
 ```
-
-or Python 3.x
-
-```sh
-sudo apt-get install python3
-```
-
-The latest version of Z3 can now be cloned and installed. This may take a while.
-
-```sh
-git clone https://github.com/Z3Prover/z3.git
-cd z3
-python3 scripts/mk_make.py --python
-cd build
-make
-sudo make install
-```
-
-Replace `python3` by `python` if you chose installing Python 2.x.
 
 Afterwards, CEGIS is ready to be installed.
 
@@ -48,5 +26,7 @@ cmake ..
 make
 sudo make install
 ```
+
+Since Z3 is automatically download, configured and installed during this procedure, this step may take a while. Pleaser enter your super user password to provide installation rights.
 
 The standard install prefix is `/usr/local`. If another prefix is desired, just replace `cmake ..` by `cmake -DCMAKE_INSTALL_PREFIX:PATH=/YOUR_PREFIX ..`
