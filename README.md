@@ -96,5 +96,5 @@ expr corr_cons(c);
 // let's rock CEGIS
 CEGISHandler handler(&c, impl, inp, hlp, impl_cons, behav_cons, corr_cons);
 auto result = handler.CEGISRoutine();
-result.printResult();
+result.printResults();
 ```
