@@ -52,11 +52,23 @@ make
 sudo make install
 ```
 
-Since Z3 is automatically download, configured and installed during this procedure, this step may take a while.
+Since Z3 is automatically downloaded, configured and installed during this procedure, this step may take a while.
 Please enter your super user password to provide installation rights.
 
-The standard install prefix is `/usr/local`. If another prefix is desired, just replace
-`cmake ..` by `cmake -DCMAKE_INSTALL_PREFIX:PATH=/YOUR_PREFIX ..`
+The standard install prefix is `/usr/local/`. If another prefix is desired, just replace
+`cmake ..` by `cmake -DCMAKE_INSTALL_PREFIX:PATH=/YOUR_PREFIX ..`. If you do not want Z3 to be downloaded and installed
+during the build step because you have it already set up in your system, simply add `-DINSTALL_Z3=OFF` to your
+`cmake` parameter list. Both options can be configured using `ccmake`, too,  of course.
+
+### Uninstall
+
+If you want to uninstall the CEGIS library and the downloaded Z3 solver, simply type
+
+```sh
+sudo xargs rm < install_manifest.txt
+```
+
+in the build directory.
 
 ## Usage
 
@@ -96,5 +108,5 @@ expr corr_cons(c);
 // let's rock CEGIS
 CEGISHandler handler(&c, impl, inp, hlp, impl_cons, behav_cons, corr_cons);
 auto result = handler.CEGISRoutine();
-result.printResults();
+result.print();
 ```

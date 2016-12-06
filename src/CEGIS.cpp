@@ -37,20 +37,20 @@ const CEGISHandler::CEGISResult CEGISHandler::CEGISRoutine()
 
     auto start = clock::now();
     while (true) {
-        auto impl_tp = findImplementation();
-        if (std::get<1>(impl_tp) == z3::sat) // another implementation was found
+        auto implTp = findImplementation();
+        if (std::get<1>(implTp) == z3::sat) // another implementation was found
         {
-            auto ce_tp = findCounterExample(std::get<0>(impl_tp).get());
-            if (std::get<1>(ce_tp) == z3::sat) // another counter-example was found
+            auto ceTp = findCounterExample(std::get<0>(implTp).get());
+            if (std::get<1>(ceTp) == z3::sat) // another counter-example was found
             {
-                counterExamples.push_back(std::move(std::get<0>(ce_tp).get()));
+                counterExamples.push_back(std::move(std::get<0>(ceTp).get()));
             } else // no more counter-examples possible
             {
-                return CEGISResult(impl_tp, counterExamples, start, clock::now(), name);
+                return CEGISResult(implTp, counterExamples, start, clock::now(), name);
             }
         } else // no implementation possible
         {
-            return CEGISResult(impl_tp, counterExamples, start, clock::now(), name);
+            return CEGISResult(implTp, counterExamples, start, clock::now(), name);
         }
     }
 }
@@ -182,14 +182,14 @@ const size_t CEGISHandler::CounterExample::getNumber() const { return id; }
 // ********************* CEGISResult **************************
 // ************************************************************
 
-CEGISHandler::CEGISResult::CEGISResult(const ImplementationTuple         & impl_tp,
+CEGISHandler::CEGISResult::CEGISResult(const ImplementationTuple         & implTp,
                                        const std::vector<CounterExample> & ces,
                                        const CEGISResult::TimePoint      & start,
                                        const CEGISResult::TimePoint      & end,
                                        const std::string                 & n)
         :
-        implementation(std::get<0>(impl_tp)),
-        result(std::get<1>(impl_tp)),
+        implementation(std::get<0>(implTp)),
+        result(std::get<1>(implTp)),
         counterExamples(ces),
         startPoint(start),
         endPoint(end),
@@ -211,8 +211,7 @@ long CEGISHandler::CEGISResult::getRuntime() const
     return std::chrono::duration_cast<std::chrono::milliseconds>( endPoint - startPoint ).count();
 }
 
-void CEGISHandler::CEGISResult::printResults(std::ostream & out,
-                                             bool           csv)
+void CEGISHandler::CEGISResult::print(std::ostream &out, bool csv)
 {
     if (csv)
         out << name << ", " << result << ", " << getNumberOfCounterExamples() << ", " << getRuntime() << std::endl;

@@ -209,8 +209,7 @@ private:
          * @param out The std::ostream object to which the results should be written.
          * @param csv A flag to indicate whether the output should be formatted comma-seperated.
          */
-        void printResults(std::ostream & out = std::cout,
-                          bool           csv = false);
+        void print(std::ostream &out = std::cout, bool csv = false);
     }; // CEGISResult
 
     /**
