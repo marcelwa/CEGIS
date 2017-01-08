@@ -38,12 +38,12 @@ const CEGISHandler::CEGISResult CEGISHandler::CEGISRoutine()
     auto start = clock::now();
     while (true) {
         auto implTp = findImplementation();
-        if (std::get<1>(implTp) == z3::sat) // another implementation was found
+        if (getResult(implTp) == z3::sat) // another implementation was found
         {
-            auto ceTp = findCounterExample(std::get<0>(implTp).get());
-            if (std::get<1>(ceTp) == z3::sat) // another counter-example was found
+            auto ceTp = findCounterExample(getImpl(implTp));
+            if (getResult(ceTp) == z3::sat) // another counter-example was found
             {
-                counterExamples.push_back(std::move(std::get<0>(ceTp).get()));
+                counterExamples.push_back(std::move(getCE(ceTp)));
             } else // no more counter-examples possible
             {
                 return CEGISResult(implTp, counterExamples, start, clock::now(), name);
@@ -55,7 +55,7 @@ const CEGISHandler::CEGISResult CEGISHandler::CEGISRoutine()
     }
 }
 
-const CEGISHandler::ImplementationTuple CEGISHandler::findImplementation()
+const CEGISHandler::ImplementationPair CEGISHandler::findImplementation()
 {
     if (!counterExamples.empty()) {
         // extract constraints from latest counter example
@@ -74,16 +74,16 @@ const CEGISHandler::ImplementationTuple CEGISHandler::findImplementation()
         case z3::sat:
         {
             auto m = implementationSolver.get_model();
-            return std::make_tuple(Implementation(m), z3::sat);
+            return std::make_pair(Implementation(m), z3::sat);
         }
         case z3::unsat:
-            return std::make_tuple(boost::optional<Implementation>(), z3::unsat);
+            return std::make_pair(boost::optional<Implementation>(), z3::unsat);
         case z3::unknown:
-            return std::make_tuple(boost::optional<Implementation>(), z3::unknown);
+            return std::make_pair(boost::optional<Implementation>(), z3::unknown);
     }
 }
 
-const CEGISHandler::CounterExampleTuple CEGISHandler::findCounterExample(const Implementation & impl)
+const CEGISHandler::CounterExamplePair CEGISHandler::findCounterExample(const Implementation & impl)
 {
     auto implCons = impl.extractConstraints(implementationVariables, context);
     counterExampleSolver.push();
@@ -94,12 +94,12 @@ const CEGISHandler::CounterExampleTuple CEGISHandler::findCounterExample(const I
         {
             auto m = counterExampleSolver.get_model();
             counterExampleSolver.pop();
-            return std::make_tuple(CounterExample(m), z3::sat);
+            return std::make_pair(CounterExample(m), z3::sat);
         }
         case z3::unsat:
-            return std::make_tuple(boost::optional<CounterExample>(), z3::unsat);
+            return std::make_pair(boost::optional<CounterExample>(), z3::unsat);
         case z3::unknown:
-            return std::make_tuple(boost::optional<CounterExample>(), z3::unknown);
+            return std::make_pair(boost::optional<CounterExample>(), z3::unknown);
     }
 }
 
@@ -182,14 +182,14 @@ const size_t CEGISHandler::CounterExample::getNumber() const { return id; }
 // ********************* CEGISResult **************************
 // ************************************************************
 
-CEGISHandler::CEGISResult::CEGISResult(const ImplementationTuple         & implTp,
+CEGISHandler::CEGISResult::CEGISResult(const ImplementationPair          & implP,
                                        const std::vector<CounterExample> & ces,
                                        const CEGISResult::TimePoint      & start,
                                        const CEGISResult::TimePoint      & end,
                                        const std::string                 & n)
         :
-        implementation(std::get<0>(implTp)),
-        result(std::get<1>(implTp)),
+        implementation(getOImpl(implP)),
+        result(getResult(implP)),
         counterExamples(ces),
         startPoint(start),
         endPoint(end),
@@ -219,7 +219,7 @@ void CEGISHandler::CEGISResult::print(std::ostream &out, bool csv)
     {
         out << "Benchmark:         " << name                            << std::endl;
         out << "Result:            " << result                          << std::endl;
-        out << "#Counter examples: " << getNumberOfCounterExamples()    << std::endl;
+        out << "#Counter-examples: " << getNumberOfCounterExamples()    << std::endl;
         out << "Runtime:           " << getRuntime() << " milliseconds" << std::endl;
     }
 }

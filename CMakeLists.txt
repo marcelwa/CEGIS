@@ -22,7 +22,7 @@ endif()
 find_package(PythonInterp REQUIRED)
 
 # Give the user the option to avoid downloading Z3
-option(INSTALL_Z3 "Z3 will be downloaded, build and installed." ON)
+option(INSTALL_Z3 "Z3 will be downloaded, built and installed." ON)
 
 if(INSTALL_Z3)
     # Clone, build and install Z3
@@ -43,7 +43,7 @@ if(INSTALL_Z3)
                         INSTALL_COMMAND     sudo make install
                         UPDATE_DISCONNECTED 1
                         )
-endif ()
+endif()
 
 # Create shared library
 add_library(${PROJECT_NAME} SHARED ${SOURCES})

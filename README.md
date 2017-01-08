@@ -27,7 +27,7 @@ examples that uncover incorrect behavior in the latest synthesised implementatio
 implementations possible, i.e. the specification is not realisable, or no more counter examples possible, i.e. the
 latest implementation must be correct.
 
-This CEGIS library works with the SMT solver Z3 and requires insight in the synthesis task to be executed as it has to
+This CEGIS library works with the SMT solver Z3 and requires insight in the synthesis task to be executed, as it has to
 be specified which variables belong to implementation, inputs, etc. Boundary conditions are to be specified manually as
 well.
 
@@ -72,7 +72,7 @@ in the build directory.
 
 ## Usage
 
-The functionality of this library is encapsulated in a class called CEGISHandler. This class handles the given
+The functionality of this library is encapsulated in a class called `CEGISHandler`. This class handles the given
 variables, constraints and execution of the CEGIS loop as well as runtime measurement and many other tasks.
 
 ```cpp

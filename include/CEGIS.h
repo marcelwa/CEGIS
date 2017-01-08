@@ -6,7 +6,6 @@
 #define CEGIS_CEGIS_H
 
 #include <iostream>
-#include <tuple>
 #include <chrono>
 #include <boost/optional.hpp>
 #include <boost/format.hpp>
@@ -116,11 +115,53 @@ private:
     /**
      * Alias to use as findImplementation() return type.
      */
-    using ImplementationTuple = std::tuple<boost::optional<Implementation>, z3::check_result>;
+    using ImplementationPair = std::pair<boost::optional<Implementation>, z3::check_result>;
+    /**
+     * Returns the boost::optional<Implementation> of an ImplementationPair.
+     *
+     * @param implP ImplementationPair.
+     * @return First value of implP, namely the optional Implementation.
+     */
+    static inline const boost::optional<Implementation> & getOImpl(const ImplementationPair & implP) { return implP.first; }
+    /**
+     * Returns the Implementation of an ImplementationPair.
+     *
+     * @param implP ImplementationPair.
+     * @return First value of implP, namely the Implementation.
+     */
+    static inline const Implementation & getImpl(const ImplementationPair & implP) { return implP.first.get(); }
+    /**
+     * Returns the result of an ImplementationPair.
+     *
+     * @param implP ImplementationPair.
+     * @return Second value of implP, namely the result returned by Z3.
+     */
+    static inline const z3::check_result & getResult(const ImplementationPair & implP) { return implP.second; }
     /**
      * Alias to use as findCounterExample() return type.
      */
-    using CounterExampleTuple = std::tuple<boost::optional<CounterExample>, z3::check_result>;
+    using CounterExamplePair = std::pair<boost::optional<CounterExample>, z3::check_result>;
+    /**
+     * Returns the boost::optional<CounterExample> of a CounterExamplePair.
+     *
+     * @param ceP CounterExamplePair.
+     * @return First value of ceP, namely the optional CounterExample.
+     */
+    static inline const boost::optional<CounterExample> & getOCE(const CounterExamplePair & ceP) { return ceP.first; }
+    /**
+     * Returns the CounterExample of a CounterExamplePair.
+     *
+     * @param ceP CounterExamplePair.
+     * @return First value of ceP, namely the CounterExample.
+     */
+    static inline const CounterExample & getCE(const CounterExamplePair & ceP) { return ceP.first.get(); }
+    /**
+     * Returns the result of a CounterExamplePair.
+     *
+     * @param ceP CounterExamplePair.
+     * @return Second value of ceP, namely the result returned by Z3.
+     */
+    static inline const z3::check_result & getResult(const CounterExamplePair & ceP) { return ceP.second; }
 
     /**
     * The result type of the CEGIS routine storing the found implementation, all the counter examples
@@ -165,7 +206,7 @@ private:
          * @param end The time stamp where the CEGIS routine finished.
          * @param n The name of the current implementation task.
          */
-        CEGISResult(const ImplementationTuple         & implTp,
+        CEGISResult(const ImplementationPair          & implP,
                     const std::vector<CounterExample> & ces,
                     const TimePoint                   & start,
                     const TimePoint                   & end,
@@ -208,6 +249,8 @@ private:
          *
          * @param out The std::ostream object to which the results should be written.
          * @param csv A flag to indicate whether the output should be formatted comma-seperated.
+         *            If csv is set, the header should look like this:
+         *            Benchmark, Result, #Counter-examples, Runtime
          */
         void print(std::ostream &out = std::cout, bool csv = false);
     }; // CEGISResult
@@ -264,7 +307,7 @@ private:
      *
      * @return A boost::optional containing this valuation as an Implementation object iff one was found.
      */
-    const ImplementationTuple findImplementation();
+    const ImplementationPair findImplementation();
 
     /**
      * Given the current Implementation, this function calls the counterExampleSolver to find a new valuation
@@ -274,7 +317,7 @@ private:
      * @return A boost::optional containing this contradiction, i.e. the valuation of the input variables, as
      * a CounterExample object iff one was found.
      */
-    const CounterExampleTuple findCounterExample(const Implementation & impl);
+    const CounterExamplePair findCounterExample(const Implementation & impl);
 
     /**
      * Returns a z3::expr where all variables of vars appearing in expr are replaced by the pattern templ using the
